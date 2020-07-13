@@ -12,11 +12,11 @@ function Photo(props) {
 
     useEffect(() => {
         clickCart(url, inCart)
-    }, [inCart])
+    }, [inCart, clickCart, url])
 
     useEffect(() => {
         clickLike(url, inLike)
-    }, [inLike])
+    }, [inLike, clickLike, url])
 
     return (
         <div 
