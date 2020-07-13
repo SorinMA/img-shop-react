@@ -12,4 +12,4 @@ function Photos(props) {
     )
 }
 
-export default Photos
+export default React.memo(Photos)
