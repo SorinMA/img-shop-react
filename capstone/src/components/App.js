@@ -4,11 +4,10 @@ import Photos from "./Photos"
 import Cart from "./Cart"
 import {Switch, Route} from "react-router-dom"
 
-function App(props) {
+function App(props) { // the main app
     return (
         <>
             <Header />
-
             <Switch>
                 <Route exact path="/"><Photos /></Route>
                 <Route  path="/cart"><Cart /></Route>

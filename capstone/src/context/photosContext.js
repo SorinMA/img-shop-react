@@ -8,16 +8,15 @@ function ProviderContext(props) {
     useEffect(() => {
         fetch("https://raw.githubusercontent.com/bobziroll/scrimba-react-bootcamp-images/master/images.json")
         .then(response => response.json())
-        .then(data => {setPhotos(data)})
-            
-    }, [])
+        .then(data => {setPhotos(data)})   
+    }, []) // use effect of didMount to fetch the data from the open source api
 
     return (
-        <>
-            <PhotoContext.Provider value={{photos:photos}}>
-                {props.children}
-            </PhotoContext.Provider>
-        </>
+        <PhotoContext.Provider 
+            value={{photos:photos}}
+        >
+            {props.children}
+        </PhotoContext.Provider>
     )
 
 }

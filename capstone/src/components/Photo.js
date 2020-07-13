@@ -3,11 +3,11 @@ import {imgCSS, containerCSS, topLeft, topRight} from "./CSS/photoCSS"
 import {FavAndCartContext} from "../context/cartAndLikeContext"
 
 function Photo(props) {
-    let {getCart, getLike, clickLike, clickCart} = useContext(FavAndCartContext)
+    let {cart, like, clickLike, clickCart} = useContext(FavAndCartContext)
     const {url} = props.data
     let [hover, setHover] = useState(false)
-    let [inLike, setInLike] = useState((getLike()).indexOf(url) === -1 ? false : true)
-    let [inCart, setInCart] = useState((getCart()).indexOf(url) === -1 ? false : true)
+    let [inLike, setInLike] = useState(like.indexOf(url) === -1 ? false : true)
+    let [inCart, setInCart] = useState(cart.indexOf(url) === -1 ? false : true)
     console.log("img")
 
     useEffect(() => {
