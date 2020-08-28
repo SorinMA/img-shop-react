@@ -1,0 +1,537 @@
+ReactDOM.render(WHAT DO I WANT TO RENDER, WHERE DO I WANT TO RENDER IT)
+
+in zona WHAT DO I WANT TO RENDER nu pot fi doua taguri spre exeplu <p> adasd </p> 
+<h1> qweqwe </h1> unul langa celalat.
+Ca treaba asta sa merga trebuies incapsulate, sre exemplu intr-un <div> ... </div>
+
+--
+ functie care returneaza JSX
+
+ex:
+function Sx() {
+	return (
+	<div> ... </div>
+	)
+}
+
+apelare in .render
+<Sx />
+
+--
+
+import React from "react"
+
+function MyInfo() {
+  return (
+    <div>
+      <h1>Bob Ziroll</h1>
+      <p>This is a paragraph about me...</p>
+      <ul>
+        <li>Thailand</li>
+        <li>Japan</li>
+        <li>Nordic Countries</li>
+      </ul>
+    </div>
+  )
+}
+
+export default MyInfo
+
+(file: MyInfo.js)
+--
+
+function App() {
+    return (
+        <div>
+            <Header />
+            <MainContent />
+            <Footer />
+        </div>
+    )
+}
+
+--
+
+pentru style utilizam atributul clasName (in elementele de html deja existeme)
+cum ar fi <h1>, nu merge (pentru moment className pentru spre ex <App />)
+
+---
+
+<h1>Hello {firstName + " " + lastName}!</h1>
+in zona de JSX pentru a putea rula cod de JS trebui pus codul in {}.
+--
+tratare style ca pe o const in JS
+
+const styles = {
+    color: "#FF8C00", 
+    backgroundColor: "#FF2D00"
+  }
+  
+  return (
+    <h1 style={styles}>Good {timeOfDay}!</h1>
+  )
+
+(use campleCase)
+--
+
+const styles = {
+    fontSize: 30
+  }
+  
+  if (hours < 12) {
+    timeOfDay = "morning"
+    styles.color = "#04756F"
+  }
+(dynamic data)
+---
+
+functiile care returneaza JSX se numesc functional components
+
+-----
+
+
+unction ContactCard(props) {
+  
+    return (
+        <div className="contact-card">
+           
+        </div>
+    )
+}
+
+se foloseste props ca conventie, iar props este un obiect ce are ca componente
+ce i se da ca prop tagului, ex <ContactCard tt="dqwdqd" />
+in props se va gasi : props.tt
+
+----
+<ContactCard 
+                contact={{name: "Mr. Whiskerson", imgUrl: "http://placekitten.com/300/200", phone: "(212) 555-1234", email: "mr.whiskaz@catnap.meow"}}
+            />
+
+=> props.contact.name (more nicer daca avem foarte multe props,like 50)
+--
+
+import React from "react"
+
+import Joke from "./Joke"
+
+import jokesData from "./jokesData"
+
+function App() {
+    
+    return (
+        <div>
+            {jokesData.map((jokes, id) => 
+                <Joke 
+                    key = {id}
+                    question = {jokes.question}
+                    punchLine = {jokes.punchLine}  
+                />
+            )}
+        </div>
+    )
+}
+
+export default App
+
+
+---
+la arrow functions
+
+() => {return <Kok />}
+este similar cu () => <Kok />
+Chestia asta se numeste implicit return.
+
+--
+function TodoItem(prop) {
+    return (
+        <div className="todo-item">
+            <input type="checkbox" checked={prop.todo.completed} />
+            <p>{prop.todo.text != undefined ? prop.todo.text : ""}</p>
+        </div>
+    )
+}
+// la checed trebuie onchange hanlder
+<div className="todo-list">
+            {todosData.map((todo) => 
+                <TodoItem 
+                    key={todo.id}
+                    todo={todo}
+                />
+            )}
+        </div>
+-
+
+---- Class based components
+
+
+import React from "react"
+
+function App() {
+    return (
+        <div>
+            <h1>Code goes here</h1>
+        </div>
+    )
+}
+
+export default App
+
+(convert functions based comp to class based comp) ==>
+
+
+class App extends React.Component {
+    render() {
+        return (
+            <div>
+                <h1>Code goes here</h1>
+            </div>
+        )
+    }
+}
+
+obsv: ar fi bine care lgocia randarii sa fie inainte de return.
+
+-- add method (personal one)
+
+
+class App extends React.Component {
+    
+    yourMethodHere() {
+        
+    }
+    
+    render() {
+        t
+        return (
+            <div>
+                <h1><h1>{this.props}</h1></h1>
+            </div>
+        )
+    }
+}
+// acum props se foloseste cu this.props (pentru ca suntem in clasa)
+
+----==!!! State = is the data that a component maintain.
+
+constructor() {
+        super()
+        this.state = {
+            answer: "Yes"
+        }
+    }
+
+--
+
+folosind state, prin updatatrea cu setState se vor updata toate campurile ce utilizeaza state-ul repsectiv in aplicatie (update automat).
+
+!when the method is the part of my class u need to use this.method_name for call.
+
+!! De fiecare data cand intr-o functoe vrem sa folosim setState trebuie sa ii facem
+bind functiei in constructor
+spre ex: 
+constructor() {
+...
+this.my_fct_name = this.my_fct_name.bind(this)
+...
+
+moduri de utilizare setState
+1. setState(new_value)
+2. setState((prevState) => {return new_state(prevState)
+})
+
+}
+
+
+
+
+
+---------------
+
+handleChange(id) {
+        // Update state so that the item with the given id flips `completed` from false to true (or vise versa)
+        // Remember not to modify prevState directly, but instead to return a new version of state with the change you want included in that update. (Think how you might use the `.map` method to do this)
+        this.setState(oldState => {
+            return oldState.todos.map((value) => {
+                if (value.id == id)
+                    value.completed = value.completed ? false : true
+                return value
+            })
+        })
+    }
+
+onChange={() => {
+                    props.checkBoxHandler(props.item.id)}}
+            />\
+
+
+
+--------- lifecycle methods in react
+
+
+componentDidMount() {
+        // GET the data I need to correctly display
+    }
+
+este apelata doar odata cand obiectul este creat si de obicei e folosita pentru
+preluare de date de la un api.
+
+shouldComponentUpdate(nextProps, nextState) {
+        // return true if want it to update
+        // return false if not
+    } // o metoda de optimizare a aplicatiei.
+
+
+--- Conditional Render
+
+&& and operator
+returneaza prima voare de fals
+daca avem
+v1 && v2 si v1 e fals, returneaza v1, daca nu returneaza v2
+
+in React fals printat in pagina web nu afiseaza nimic
+ex
+
+ <div>
+                {
+                    this.state.unreadMessages.length > 0 && 
+                    <h2>You have {this.state.unreadMessages.length} unread messages!</h2>
+                }
+            </div>
+
+
+---
+
+componentDidMount() {
+        this.setState({loading: true})
+        fetch("https://swapi.co/api/people/1")
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    loading: false,
+                    character: data
+                })
+            })
+    }
+
+--
+
+-==--==Forms
+
+"on every key stroke we ll gonna update the state"
+
+constructor() {
+        super()
+        this.state = {
+            firstName: ""
+        }
+        this.handleChange = this.handleChange.bind(this)
+    }
+    
+    handleChange(event) { // foarte foarte important
+        this.setState({ // prin event faci referire la tagul care se modirfica
+            firstName: event.target.value
+        })
+    }
+    
+    render() {
+        return (
+            <form>
+                <input type="text" placeholder="First Name" onChange={this.handleChange} />
+                <h1>{this.state.firstName}</h1>
+            </form>
+        )
+    }
+
+
+---
+
+
+
+ handleChange(event) {
+        this.setState({
+            [event.target.name]: event.target.value
+        })
+    }
+    
+    render() {
+        return (
+            <form>
+                <input type="text" name="firstName" placeholder="First Name" onChange={this.handleChange} />
+                <br />
+                <input type="text" name="lastName" placeholder="Last Name" onChange={this.handleChange} />
+                <h1>{this.state.firstName} {this.state.lastName}</h1>
+            </form>
+        )
+    }
+
+
+---
+
+update 
+
+<input type="text" value={this.state.firstName} name="firstName" placeholder="First Name" onChange={this.handleChange} />
+                <br />
+                <input type="text" value={this.state.lastName} name="lastName" placeholder="Last Name" onChange={this.handleChange} />
+
+
+
+
+handleChange(event) {
+        const {name, value} = event.target
+        this.setState({
+            [name]: value
+        })
+    } is better then the old one (pentru a evita bugguri).
+
+
+---
+handleChange(event) {
+        const {name, value, type, checked} = event.target
+        type === "checkbox" ? this.setState({ [name]: checked }) : this.setState({ [name]: value })
+    }
+
+
+<textarea value={"Some default value"}/>
+
+<label>
+                    <input 
+                        type="radio" 
+                        name="gender"
+                        value="female"
+                        checked={this.state.gender === "female"}
+                        onChange={this.handleChange}
+                    /> Female
+                </label>
+
+
+<select 
+                    value={this.state.favColor}
+                    onChange={this.handleChange}
+                    name="favColor"
+                >
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="red">Red</option>
+                    <option value="orange">Orange</option>
+                    <option value="yellow">Yellow</option>
+                </select>
+
+-=-=-=-=--=-=
+
+<form onSubmit={this.handleSubmit}>
+
+=--=-=-=-=-==-=
+
+
+
+Nu e ok cand o componenta devine mare
+astfel cel mai bine e sa separam compoenta in:
+Container // partea ce se ocupa de logica si mentinerea stateului --bussiness logic
+si Component // partea ce se ocupa de randare (o componenta functionala) - render
+
+ex:
+Form -> FormContainer, FormComponent
+
+---
+
+
+handleSubmit(event) {
+        event.preventPre // !!!!!! ca sa nu faca update la page (refresh)(
+    }
+    
+    render() {
+        return (
+            <div>
+                <form className="meme-form" onSubmit={this.handleSubmit}>
+
+
+
+
+
+
+---------------
+
+handleChange = (event) => {
+        const { name, value } = event.target
+        this.setState({
+            [name]: value
+        })
+    }
+
+if u using arrw function instead normal one, there s no need to .bind(this)
+cuz it s automaticaly there.
+
+/**
+ * Other modern/advanced React features/topics to learn:
+ * 
+ * Official React Context API - https://reactjs.org/docs/context.html  ///soemhwo better then redux
+ * Error Boundaries - https://reactjs.org/docs/error-boundaries.html
+ * render props - https://reactjs.org/docs/render-props.html
+ * Higher Order Components - https://reactjs.org/docs/higher-order-components.html
+ * React Router - https://reacttraining.com/react-router/core/guides/philosophy
+ * React Hooks - https://reactjs.org/docs/hooks-intro.html
+ * React lazy, memo, and Suspense - https://reactjs.org/blog/2018/10/23/react-v-16-6.html
+ */
+
+
+
+--- Hooks
+
+"hook into" state ad lifecycle methods of a components without using classes.
+
+[val, setVal] = useState()
+[,] <-- array destructuring
+{, } <-- object destructuring
+
+--
+useEfect
+
+este ca // componentDidMount
+// componentDidUpdate
+// componentWillUnmount
+de fiecare data cand componenta e randata este apleat useEfect
+
+useEffect(() => {
+        // setColor(randomcolor())
+    }, [count])
+
+all doilea paramentru all useEffect este un vector de parametrii.
+useEffect este apelat cand unul din acei paramentrii este modificat.
+
+deci useEffect are sintaxa
+useEffect(f(), [])
+si este apelata initial cand se randeaza componenta.
+si apoi este apelata din nou daca una din prop din [] sunt modificate.
+daca [] este empty, atunci va fi apela doar odata. (la randare) ca didMount
+
+   useEffect(() => {
+        setInterval(() => {
+            setCount(prevCount => prevCount + 1)
+        }, 1000)
+    }, [])
+    
+    useEffect(() => {
+        setColor(randomcolor())
+    }, [count])
+
+(aparent merg doua instante a lui useEffect)
+
+-- component will unmount
+
+   useEffect(() => {
+        const intervalId = setInterval(() => { // intervalId  e un id returnat de functia setInterval pentru a sti la ce interval en referim cand dorim sa l curatam
+            setCount(prevCount => prevCount + 1)
+        }, 1000)
+        return () => clearInterval(intervalId) // functia returnata va fi salvata si apelata atuncti cand componenta ce tuilizeaza useEffect va fi unmounted
+    }, [])
+
+-- ideas
+
+https://medium.freecodecamp.org/every-time-you-build-a-to-do-list-app-a-puppy-dies-505b54637a5d
+
+https://medium.freecodecamp.org/want-to-build-something-fun-heres-a-list-of-sample-web-app-ideas-b991bce0ed9a
+
+https://medium.freecodecamp.org/summer-is-over-you-should-be-coding-heres-yet-another-list-of-exciting-ideas-to-build-a95d7704d36d
+
+

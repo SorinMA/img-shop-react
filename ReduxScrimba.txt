@@ -1,0 +1,463 @@
+Redux was created before context api was stable.
+
+La baza Redux foloseste context.
+
+It s a state management tool.
+
+It s more like a philosophy to manage your code.
+
+
+Principii:
+1. global state
+2. read-only ("actions")
+3. channges made with pure functions ("reducers").
+
+Action -> dispatch -> reduce -> store -> Action ....
+
+------------------ ReduxJS
+
+ex:
+
+const redux = require("redux")
+const initialState = {
+    count: 0
+}
+
+function reducer(state=initialState, action) {
+    switch(action.type) {
+        case "INCREMENT":
+            return {
+                count: state.count + 1
+            }
+        case "DECREMENT":
+            return {
+                count: state.count - 1
+            }
+        default:
+            return state
+    }
+}
+
+const store = redux.createStore(reducer)
+
+store.subscribe(() => {
+    console.log(store.getState())
+})
+
+store.dispatch({type: "INCREMENT"})
+store.dispatch({type: "INCREMENT"})
+store.dispatch({type: "DECREMENT"})
+
+-=-==--==
+
+action e un obiect cu cheie 
+type si valoare string (uppercase) ce reprezinta actiunea:
+
+const action = {
+    type: "INCREMENT"
+}
+
+Obsv: poate avea mai multi params.
+
+Action creators:
+in loc sa creezi o constanta creezi o functie ce sa returneze obiectul actiunii ex:
+function increment() {
+    return {
+        type: "INCREMENT"
+    }
+}
+
+
+---- Reducer 
+E o functie ce retunreaza o noua stare(un nou state) pe baza tipului actinunii primite (action.type).
+Reducer ia ca parametrii vechiul state si o  actiune.
+
+ex:
+function reducer(state = {count: 0}, action) {
+    // return new state based on the incoming action.type
+    switch(action.type) {
+        case "INCREMENT":
+            return {
+                count: state.count + 1
+            }
+        case "DECREMENT":
+            return {
+                count: state.count - 1
+            }
+        default:
+            return state
+    }
+}
+
+
+ca default, daca nici o actiune nu exista in Switch se returenaza starea deja existetna.
+
+--- Store
+
+const store = redux.createStore(reducer)
+
+
+componente store:
+{dispatch: dispatch(action), subscribe: subscribe(listener), getState: getState(), replaceReducer: replaceReducer(nextReducer)}
+
+
+---
+store.subscribe
+este o functie care ia ca parametru o functie
+ ex:
+
+store.subscribe(()=> {})
+
+si e apelata cand se intampla schimbari in store.
+
+store.getState() returneaza stateul curent al aplicatiei noastre.
+
+
+store.dispatch()
+ia ca parametru o actiune
+
+store.dispatch(action)
+
+el duce actiunea la reducer pt a updata stateul.
+
+
+
+---- Payload
+
+Se poate numi oricum payuload, data ....
+
+function increment(amount) {
+    return {
+        type: "INCREMENT",
+        data: amount
+    }
+}
+
+scopul lui este ca actiunea ce are loc sa fie mai dinaimica ex:
+
+switch(action.type) {
+        case "INCREMENT":
+            return {
+                count: state.count + action.payload
+            }
+
+la increment se aduna payloadul nu se mai adauga 1.
+
+Atata tot ezpz.
+
+e bine sa aiba un default param action creatorul in cazul in care nu se primeste param.
+
+
+
+Obsv:
+pushing in an array:
+
+[...state.favoriteThings, action.payload]
+
+--- complex state
+
+
+case "ADD_FAVORITE_THING":
+  
+const initialState = {
+    count: 0,
+    favoriteThings: []
+}
+
+...
+          return {
+                ...state,
+                favoriteThings: [...state.favoriteThings, action.payload]
+            }
+
+
+daca updatam doar o parte a stateului sa nu uitam si de retul de componente.
+
+
+
+----
+
+case "UPVOTE_VIDEO":
+            return {
+                ...state,
+                youtubeVideo: {
+                    ...state.youtubeVideo,
+                    votes: {
+                        ...state.youtubeVideo.votes,
+                        up: state.youtubeVideo.votes.up + 1
+                    }
+                }
+            }
+
+
+
+const initialState = {
+    count: 0,
+    favoriteThings: [],
+    youtubeVideo: {
+        title: "",
+        viewCount: 0,
+        votes: {
+            up: 0,
+            down: 0
+        }
+    }
+}
+
+
+
+
+-=-=-==--=
+
+cel mai ok este sa spargi reducerul mare in reduceri mici fieare ocupandu-se de o parte a stateului.
+
+avand mai multi reduceri acestia sunt combinati intr-unu singur.
+
+// import the separate reducers
+// combine the reducers into a single state tree
+// create the store
+// export the store
+
+
+const redux = require("redux")
+const {combineReducers, createStore} = redux
+import countReducer from "./count"
+import favoriteThingsReducer from "./favoriteThings"
+import youTubeVideoReducer from "./youTubeVideo"
+
+const rootReducer = combineReducers({
+    count: countReducer,
+    favoriteThings: favoriteThingsReducer,
+    youTubeVideo: youTubeVideoReducer
+})
+
+const store = createStore(rootReducer)
+export default store
+
+
+
+toate reduce-ruile sunt combinate cu
+redux.combineReducres({reducer1,.....})
+\
+
+Obsv: ar fi nice ca codul de redux sa se afle in propiul director.
+
+
+
+----- react-redux a lib
+to integare redux in react app
+
+import {Provider} from "react-redux"
+
+Provider it's a component and with this one we ll rap out App component to use Provider pattern.
+
+Provider take one prop and that one it.s store
+store={ourStoreInstance}
+
+<Provider store={store}>
+        <App />
+    </Provider>,
+
+------ connect()
+
+It;s a HOC
+
+are doi parametrii
+
+primul este : 1la ce parti din stateul golbal are acces si 2la cate action-uri are acces.
+
+ex:
+
+connect("waht part of state we want", "what actioon we let to dispatch")(OurComponent)
+
+
+
+
+
+connect(..)(..)
+sintaxa asta reprezinta o functie ce retunreaza o functie de aia este al doilea (..)
+
+
+--==-
+
+function mapStateToProps(globalState) {
+    // return an object where the keys are the name of the prop your component wants,
+    // values are the actual parts of the global state your component wants
+}
+
+connect(mapStateToProps,...)(...)
+
+
+
+globalState este parametrul dat de connect
+
+si reprezinta stateul global.
+
+ex:
+
+function mapStateToProps(globalState) {
+    return {
+        count: globalState
+    }
+}
+
+
+mapDispatchToProps este al doilea param al functiei connect
+si este un obiect ce spune ce actiuni sunt poermise pentri dispatch.
+
+
+ex:
+
+
+
+function App(props) {    
+    return (
+        <div>
+            <h1>{props.count}</h1>
+            <button onClick={props.apples}>-</button>
+            <button onClick={props.oranges}>+</button>
+        </div>
+    )
+}
+
+// Write the mapStateToProps function from scratch
+// Takes the global state from Redux as a parameter
+// returns an object where the keys are the name of the prop your component wants,
+// and the values are the actual parts of the global state your component wants
+function mapStateToProps(state) {
+    return {
+        count: state
+    }
+}
+
+const mapDispatchToProps = {
+    oranges: increment,
+    apples: decrement
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)
+
+
+
+ce returneaza mapStateProps si mapDispatchToProps reprezinta o parte din noile props ale componentei noastre.
+
+
+
+
+---- alternative la connect()()
+
+folosind hooks :))
+
+const count = useSelector(state => state) 
+
+unde state e stateul global
+
+(are acelasi param ca primul param al functie connect()))
+
+si returneaza partea de global state ce ne intereseaza.
+
+
+si alternativa la al doilea param al functie connect ()() avem
+
+useDispatch
+
+
+const dispatch = useDispatch()
+    return (
+        <div>
+            <h1>{count}</h1>
+            <button onClick={() => dispatch(decrement())}>-</button>
+            <button onClick={() => dispatch(increment())}>+</button>
+        </div>
+    )
+
+
+/// cica pentru o testare mai usoara e mai ok sa folosesti connect pt ca face o separare a compoentei de redux.
+
+
+
+-= Redux-Thunk
+
+thunk it s considered a middlewere astfel
+pe langa thunk mai este nevboide de react.applyMiddleware
+
+
+createStore(reducer, applyMiddleware(thunk))
+
+si action ul nostru poate fi scris asa
+
+export function increment() {
+    return (dispatch) => {
+        setTimeout(() => {
+            dispatch({type: "INCREMENT"})
+        }, 1500)
+    }
+}
+
+thunk este util cand avem nevoide (ca prerequisit) pentru a rula actiunea de un api call sau ceva de genu  (asa mai async)
+; redux default nu permite asta asa ca thunk ca middleware face asta posibil.
+
+
+
+in return
+
+return (dispatch) => ...
+se mai poate adauga un al doilea param
+return (dispatch, getState)
+ in caz ca e nevoie de acces la stateul curent.
+
+
+-=-=-=-=-=-= get gired.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

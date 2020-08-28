@@ -1,0 +1,852 @@
+increment = () => {
+        this.setState(prevState => ({count: prevState.count + 1}))
+    }
+
+
+daca ai un arrw function () => ce_e_aici_e_returnat_default_daca_nu_incepe_cu_{}
+
+daca vrei sa rteturnezi un obiect folosesti () => ({obiect})
+cand incapsulezi in paranteze rotunde ii zici la arrow fct ca acolo e un obiect de returnat si nu e body ul functiei.
+
+
+
+
+stateul poate fi setat asa
+
+class NumeComp .... {
+state = {
+        count: 0
+    }
+
+} si aeriseste codul daca folosesti arrow fct.
+
+(pt ca nu mai ai nevoie de bind).
+--
+
+in render 
+ render() {
+        const {count, greeting, age} = this.state // poti accesa valorile statul;ui asa, destul de nice
+        return (
+
+--- React.Fragment
+
+<!-- <div id="root">
+    <div>
+        <div>
+            <h1>I'm the Child component</h1>
+            <div>
+                <hr>
+                <h3>I'm the Grandchild component</h3>
+                <p>I'm also a part of the Grandchild component</p>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div id="root">
+    <h1>I'm the Child component</h1>
+    <hr>
+    <h3>I'm the Grandchild component</h3>
+    <p>I'm also a part of the Grandchild component</p>
+</div>
+
+Prima varianta comentat merge pe principiul:
+return (
+        <div>
+            <Child />
+        </div>
+    )
+
+Cea de-a doua merge pe principiul
+
+return (
+        <React.Fragment>
+            <Child />
+        </React.Fragment>
+    )
+
+Pentru a evita adaugarea de noi noduri in codul de html.
+NICEEE.
+
+Dar nu e neapart sa pui <React.Fragment> poti sa pui direct <>
+return (
+        <>
+            <Child />
+        </>
+    )
+si are acelasi efect
+
+---Default Props
+
+function Card(props) {
+    const styles = {
+        backgroundColor: props.cardColor,
+        height: 100,
+        width: 100
+    }
+    
+    return (
+        <div style={styles}></div>
+    )
+}
+
+Card.defaultProps = {
+    cardColor: "blue"
+}
+
+e un obiect ce se adauga dupe declararea componentei.
+
+Daca ai o class component, si versiunea ta de babel suporta asta
+poti muta defaultProps in clasa astfel
+static defaultProps = {
+        cardColor: "blue",
+        height: 100,
+        width: 100
+    }
+--- Prop Types
+
+(tipul de date al props-urilor)
+
+those are dev tools, (will show warnings in dev stage) but in
+deplyment the warning is gone.
+import PropTypes from "prop-types"
+
+// dupa declararea componentie 
+Card.propTypes = {
+    cardColor: PropTypes.string
+}
+
+
+In cazul in care vrem ca un prop sa fie requiered putem pune
+Card.propTypes = {
+    cardColor: PropTypes.string.isRequired
+}.
+
+React Docs on PropTypes:
+https://reactjs.org/docs/typechecking-with-proptypes.html#proptypes
+
+-----===== Reusability
+
+solution: Inheritance & Composition.
+
+In react u should perefere Composition over Inhertiance.
+
+Principii:
+1. Components with props
+2. Childre
+3. HoC - beter hooks
+4. Renders Props - btr hooks
+
+----- React Children.
+
+orice componenta de forma <App /> poate fi scrisa
+sub forma <App> ... </App>
+ce se afla intre <App> si </App> se numeste children
+si sa zicem ca avem:
+<App> 
+<img url="..."/>
+</App>
+
+In componenta App se va accesa copilul folosind props
+cu propietatea children.ex:
+return (
+        <div className="border">
+            {props.children}
+        </div>
+    )
+
+Daca <App> are o structura bine definita, adica sa zicem ca randeaza o imagine si un text (si atat) cel mai bine e sa folosesti props.
+
+
+!!!=====HOC 
+
+a high order fct is a fct that take anoter fct as a param.
+un HOC- este o functie ce ea ca arguemnt principal o componenta si returneaza
+o noua componenta bazata pe ce data ca argument la care i se adaua functionalitati.
+
+
+are forma
+
+....
+const upgradedComponent = highOrder(Component) // aka augmetare
+export default upgradedComponent
+
+exportul modulului este componenta imbunatatita prin aplicarea HOC.
+
+
+in general scrierea este mai directa
+export default highOrder(Component)
+
+dummy ex:
+
+--ex_start
+
+import React from "react"
+import {withPointlessHOC} from "./withPointlessHOC"
+import {withExtraPropAdded} from "./withExtraPropAdded"
+
+function App(props) {
+    console.log(props)
+    return (
+        <div>Hello world!</div>
+    )
+}
+
+const ExtraPropComponent = withExtraPropAdded(App)
+export default ExtraPropComponent
+
+import React from "react"
+
+export function withExtraPropAdded(component) {
+    const Component = component
+    return function(props) {
+        return (
+            <Component anotherProp="Blah blah blah" {...props} />
+        )
+    }
+}
+
+---ex_end
+
+
+{...props} aparent asta pare o parte de sintxa
+ce pass along propsurile deja existente componentei noastre.!!! important
+----=
+
+la import ul HOC ului se foloseste {} pentru ca functai nu e exportata cu default.
+
+--
+
+ex:
+
+import React, {Component} from "react"
+// HOC is a function that takes a component as a parameter
+// and returns a new component wrapping the given component
+// and "supercharging" it by giving it some extra abilities
+
+class Toggler extends Component {
+    state = {
+        on: this.props.defaultOnValue
+    }
+    
+    toggle = () => {
+        this.setState(prevState => {
+            return {
+                on: !prevState.on
+            }
+        })
+    }
+    
+    render() {
+        const Component = this.props.component
+        return (
+            <Component on={this.state.on} toggle={this.toggle} {...this.props} />
+        )
+    }
+}
+
+export function withToggler(component, optionsObj) {
+    return function(props) {
+        return (
+            <Toggler component={component} defaultOnValue={optionsObj.defaultOnValue} {...props}/>
+        )
+    }
+}
+
+
+// withToggler(component, optionsObj) -- optionsObj este un obiect obtionalimport React, {Component} from "react"
+import {withToggler} from "./HOCs/withToggler"
+
+function Favorite(props) {
+    return (
+        <div>
+            <h3>Click heart to favorite</h3>
+            <h1>
+                <span 
+                    onClick={props.toggle}
+                >
+                    {props.on ? "❤️" : "♡"}
+                </span>
+            </h1>
+        </div>
+    ) 
+}
+
+const SuperchargedFavoriteComponent = withToggler(Favorite, {defaultOnValue: false})
+export default SuperchargedFavoriteComponent
+
+-----exdoen
+
+---- Render Props (a better aproach then HOC).
+
+.addEventListener("click", function(event) {
+    
+})
+
+fct addEventListener decide cu ce parametrii este apelata functia
+ofertia drept callback.
+
+render props ex:
+import React from "react"
+import Example from "./Example"
+
+function App() {
+    return (
+        <div>
+            <Example render={
+                function(bool, number) {
+                    return (
+                        <div>
+                            <h1>{number}</h1>
+                            <h1>{bool ? "true" : "false"}</h1>
+                        </div>
+                    )
+                }
+            }/>
+        </div>
+    )
+}
+
+export default App
+
+import React from "react"
+
+function Example(props) {
+    return (
+        <div>
+            {props.render(true, 42)}
+        </div>
+    )
+}
+
+export default Example
+
+Render props este cand tu dai ca argument / parametru altei componente pe care vrei sa o montezi o componentea functionala.
+
+
+-=-=-=
+
+import React, {useState} from "react"
+
+function ToggleLikeAss(props) {
+    
+    let [on, setON] = useState(props.defaultToggle)
+    
+    let toggle = () => {
+        setON(oldON => !on)
+    }
+    
+    return (
+        <>
+            {props.render(on, toggle)}
+        </>
+    )
+}
+
+ToggleLikeAss.defaultProps = {
+    defaultToggle: false,
+    render: () => <div>empty render</div>
+}
+
+export default ToggleLikeAss
+
+
+function App() {
+    return (
+        <div>
+            <ToggleLikeAss 
+                render={
+                    (on, toggle) => <Menu on={on} toggle={toggle} />
+                }
+            />
+            <hr />
+            <ToggleLikeAss 
+                render={
+                    (on, toggle) => <Favorite on={on} toggle={toggle} />
+                }
+            />
+        </div>
+    )
+}
+
+--ex2: props
+<DataFetcher url="https://swapi.co/api/people/1">
+                {(data, loading) => {
+                    return (
+                        loading ? 
+                        <h1>Loading...</h1> :
+                        <p>{JSON.stringify(data)}</p>
+                    )
+                }}
+            </DataFetcher>
+--</DataFetcher>
+render() {
+        return (
+            this.props.children(this.state.data, this.state.loading)
+        )
+    }
+
+
+--
+=-===-==- Fix bad rerandering
+React randeaza componentele recursiv pana nu mai are ce sa returneze.
+Sa zicem ca componenta principala este App si din App se dezvolta un arbore
+daca lui App i se va schimba stateul, chiar daca nu este dat mai departe, se va reranda
+tot arborele.
+Pentru a rezolva aveasta problema exista:
+1. schouldComponentUpdate ()
+2. React.PureComponent 
+3. React.memo
+
+shallow comparasion:
+const arr1 = [1, 2, 3, [4]]
+const arr2 = [1, 2, 3, [4]]
+astea di vecoti sunt egali (shallow) dar daca ii compari cu === iti da fals deoarece
+unul se afla la o adresa de memorie iar celalat se afla la alta adresa de memorie.
+
+----- shouldComponentUpdate()
+
+Do not do deep equality checks in this function.
+
+Functia ia ca parametrii urmatorii props and states
+like (nextProps, nextState)
+
+Pentru ca in shouldComponentUpdate(nextProps, nextState) {...} trebuie facuta un shallow equality test intre props si nextProps si intre state si nextState. Acest proces este lung si ineficient.
+Astfel pentru a rezolva aceasta problema reacta a introdus: --- PureComponent
+
+--- React.PureComponent
+
+implelenteaza default shouldComponentUpdate() pentru shallow comp.
+
+dissalaw u to use shouldComponentUpdate()
+
+Face skip la copii din arbore, astfel si copii trebuie sa fie PureComponent.
+
+
+---- React.Memo()
+
+
+function areEqual(prevProps, nextProps) {
+  /*
+  return true if passing nextProps to render would return
+  the same result as passing prevProps to render,
+  otherwise return false
+  */
+}
+
+export default React.memo(GrandParent, areEqual)
+
+
+it s a HOC build by react more like PureComponent used for functional Components.
+Singura diferenta este ca compara doar prevPros si nextProps (fara state) si poti implementa
+propia functie de checking numai ca aceasta are returnul invers fals pentru true si true pentru false (comparatie cu shouldComponentUpdate).
+
+
+
+---=-=-=-=!!!!!!!!!!! Context.
+
+Contextul e solutia urmatoarei probleme: daca avem doua compoente ce au nevoie de acelasi state
+si aceste componente nu sunt 'rude apropiate', atunci pentru a putea pasa acel state astfel incat
+cele doua comp sa aiva avelasi state, ar trebui sa folosim o gramada de compojnete intermediare astfel cu scopul de a pasa stateul respectiv chiar daca ele nu l folosesc.
+Astfel zis Context ofera o cale pentru a pasa date la componente.
+
+Astfel: Top Compoent va fi incapsilata intr-un Provider iar Componentele ce au nevoie de un state anume vor fi incapsulati in Consumers. Intre Provier si Consumers se face un tunel pt transferul datelor. Consumerii pot modifica datele.
+
+(o alternativa la Redux).
+
+
+ex:
+
+import React from "react"
+import ReactDOM from "react-dom"
+
+import App from "./App"
+
+const ThemeContext = React.createContext()
+const {Provider, Consumer} = ThemeContext
+// ThemeContext.Provider & ThemeContext.Consumer
+
+ReactDOM.render(
+    <ThemeContext.Provider>
+        <App />
+    </ThemeContext.Provider>,
+    document.getElementById("root")
+)
+
+
+- Un aspect important in <Provider> trebuie pasat un default prop numit value
+<Provider value={}> <App/> </Provider>
+acea valoare este valoarea / obiectul de care avem nevoie...
+
+class Button extends Component {
+    render() {
+        console.log(this.context)
+        return (
+            <button className="light-theme">Switch Theme</button>
+        )    
+    }
+}
+
+Button.contextType = ThemeContext
+
+-=-contextType
+sau 
+class Header extends Component {
+    static contextType = ThemeContext
+    render() {
+        const theme = this.context
+        return (
+            <header className="light-theme">
+                <h2>Light Theme</h2>
+            </header>
+        )    
+    }
+}
+Button.contextType = ThemeContext
+
+iar valoarea setata in
+prima metoda de a folosi variabila este prin crearea unei metode statice pentru
+clasa noastra in provider in prop-ul valoare={...} poate fi accesata in clasa cu this.context
+
+
+
+ <button className={`${this.context}-theme`}> {`${this.context}-theme`} <-- se numeste  string interpolation.
+
+
+
+contextType merge doar cu date si doar pentru consum de date nu si pentru alterarea datelor.
+
+OBSV: ca obsv chiar daca componenta care a fost incapsulata in <Provider> .. </Provider> este acolo, cand cosnuma contextul se foloseste tot de contextType.
+
+A better way to consume context:
+
+Context.Consumer (merge pe baza de render props)
+
+return (
+        <ThemeContext.Consumer>
+            {theme => (
+                <button className={`${theme}-theme`}>Switch Theme</button>
+            )}
+        </ThemeContext.Consumer>
+    
+
+!!! Nu folosim context daca vrem sa facem pass thorugfht 1 sau 2 layere.
+
+Nu incapsula cu provider decat componenta din arbore din care urmeaza compoenentele ce au nevoie 
+sa cosnume date
+
+	p1
+a1		a2
+	t1	t2
+
+daca t1 si t2 au nveoie de date fa provider pe a2 nu pe p1.
+	
+
+
+
+-------------- HOOKS
+
+
+const [inputData, setInputData] = useState({firstName: "", lastName: ""})
+    const [contactsData, setContactsData] = useState([])
+    
+    function handleChange(event) {
+        // update our inputData state
+        const {name, value} = event.target
+        setInputData(oldInput => {
+            const newInput = Object.assign({}, inputData);
+            newInput[name] = value
+            return newInput
+        })
+        
+        console.log(inputData)
+    }
+function handleSubmit(event) {
+        event.preventDefault()
+        // add the inputData to the contactsData array
+        let curentContactsData = [...contactsData] //es6 copyarray
+        curentContactsData.push(inputData)
+        console.log(curentContactsData)
+        setContactsData(curentContactsData)
+        
+    }
+
+-==-=-=-=-=- a better sol la ce e mai sus
+function handleChange(event) {
+        const {name, value} = event.target
+        setInputData(prevInputData => ({...prevInputData, [name]: value}))
+    }
+    
+    function handleSubmit(event) {
+        event.preventDefault()
+        setContactsData(prevContacts => [...prevContacts, inputData])
+    }
+...prevInputData ia continutul anterior si adaugand , [name]:value face update cu noile
+valori.
+
+------
+
+E mai simplu de folosit setTimeout decat setInterval (setTimeout ruleaza o functie dupa x secunde (odata)).
+
+---- useRef
+
+sa faci referinta la un node de html dc?? pentru ca daca ai o componenta cu un id, daca o multiplici, vor fi mai multe comp cu acelasi id, de aceea exista useRef pentru a sti la care te referi.
+a way to ref a DOM node.
+(to grab the element we want to use)
+
+const inputRef = useRef(null)
+
+<input ref={inputRef}...
+ apoi pentru a select nodul
+inputRef.current
+peste care putem face tot ce vrem noi, spre exemplu
+inputRef.current.focus()
+
+
+---useContext()
+
+in loc de 
+function Header(props) {
+    return (
+        <ThemeContextConsumer>
+            {context => (
+                <header className={`${context.theme}-theme`}>
+                    <h2>{context.theme === "light" ? "Light" : "Dark"} Theme</h2>
+                </header>
+            )}
+        </ThemeContextConsumer>
+    )    
+}
+folosesti
+function Header(props) {
+    const context = useContext(ThemeContext)
+    return (
+        <header className={`${context.theme}-theme`}>
+            <h2>{context.theme === "light" ? "Light" : "Dark"} Theme</h2>
+        </header>
+    )    
+}
+
+-----ezl 
+--- Custom hooks (pattern)
+
+cand faci dereferentierea [] dintr un array nu conteaza numele variabilelor ci ordinea
+dar cand faci din {} conteaza numele sa corespunda cu cheile dar ordinea nu conteaza
+
+import {useState} from "react"
+
+function useCounter() {
+    const [count, setCount] = useState(0) // initialize state
+    
+    function increment() { // create any functions we need for modifying the state
+        setCount(prevCount => prevCount + 1)
+    }
+    
+    return [count, increment] // return whatever we want another component to have access to (count)
+}
+
+export default useCounter
+
+
+un custom hook e doar o functie ce trebuie sa initializeze un state, sa permita modficarea stateului si sa ofere acces la state si modificator.
+
+fisierele pt hookuri si numele unui hook incepe cu litera mica (asa s-a stabilit). 
+
+
+-===================React Router (std for single page app). (SPA)
+
+Pe principiul
+
+Header
+
+ContentPage
+
+Footer
+
+in SPA ContentPage e inlocuit (dar nu prin req, ci prin swaping de componente de react) aka conditional rendering.
+
+import React from "react"
+import ReactDOM from "react-dom"
+import {BrowserRouter as Router} from "react-router-dom"
+
+import App from "./App"
+
+ReactDOM.render(
+    <Router>
+        <App />
+    </Router>, 
+    document.getElementById("root")
+)
+
+
+-=-=-=React router link
+
+import React from "react"
+import {Link} from "react-router-dom"
+
+function App() {    
+    return (
+        <div>
+            <Link to="/">Home </Link>
+            <Link to="/ss">About </Link>
+        </div>
+    )
+}
+
+export default App
+
+-==-==-=-=-Switch, Router
+
+v1component
+
+<Switch>
+                <Route exact path="/" component={Home} />
+                <Route path="/about" component={About} />
+            </Switch>
+
+v2render prop
+
+<Switch>
+                <Route exact path="/" render={() => <h1>Home Page!</h1>} />
+                <Route path="/about" render={() => <h1>About Page!</h1>} />
+            </Switch>
+
+v3 child(latest)
+obsv: daca nu pui exact o sa ia dupa path si cand dai click spre ex pe /about o sa vada ca pathul /
+are '/' din /abaout, astfel de va duce pe pathul / in loc de /about de aia pui exact.
+
+<Switch>
+                <Route exact path="/"><Home /></Route>
+
+--==---==-(aparent trebuie pus exact path doar la prina ruta, dupa lasi doar path)
+
+import {useLocation, useParams, useHistory, useRouteMatch} from "react-router-dom"
+
+(folosim hookurile astea pentru ca daca este folosita varaitna de switch 3 cu copii (children)
+atunci nu pot fi pasate locatia params history ..., ci doar custom params).
+
+
+--- nested
+
+<Route exact path="/">
+                    <Home />
+                </Route>
+                <Route exact path="/profile">
+                    <Profile />
+                </Route>
+                <Route path="/profile/info">
+                    <Info/>
+                </Route>
+                <Route path="/profile/settings">
+                    <Settings/>
+                </Route>
+
+este pus exat si pa patul de la profile pentru a face matching la /profile
+si restul cu /profile info si settings sunt fara.
+mai e varinata ca in componenta de Profile sa se faca swithc si route la /profile/info si settings
+doar ca atunci in functie de cum avem nevoie punem sau scoatem exact. daca il punem se va randa din nou componenta doria si daca nu se pune se va randa in continuarea meniului de selectare profile info si settings.
+
+
+
+<Route path="/services/:serviceId" >
+asta se ocupa dinamic de mai multe rute si salveaza varaibila spre ex /services/2 in serviceId
+care mai departe o trimite componentei pe care o are ca copil .
+componenta poate accesa acea variabila folosind un hook:import {useParams} from "react-router-dom"
+
+function ServiceDetail(props) {
+    const params = useParams() 
+    console.log(params) // {serviceId: "2"}
+    return (
+        <h1>Service Detail Page</h1>
+    )
+}
+Hooku useParams preia serviceId
+
+--- 
+
+
+
+
+
+useRouteMatch} from "react-router-dom" -- rezolva problema cand daca avem nested routes si partea principala se schimba sa se schimbe dinamic si rutele nested
+
+const match = useRouteMatch()
+    console.log(match)
+    
+    // {
+    //     path: "/user", 
+    //     url: "/user", 
+    //     isExact: true, 
+    //     params: {}
+    // }
+
+url for matching Links and path for Route
+
+// https://reacttraining.com/blog/react-router-v5-1/#useroutematch
+
+
+
+---- useHistory
+
+const {serviceId} = useParams()
+    const history = useHistory()
+    const thisService = servicesData.find(service => service._id === serviceId)
+
+    
+    function handleClick() {
+        console.log("Submitting...")
+        setTimeout(() => {
+            history.push("/services")
+        }, 2000)
+    }
+
+ca sa faci redirect si chestii (push te duce la pathul dat)
+
+----- useLocation
+an easy acces to info of location where u are in app rather then path
+
+    const location = useLocation()
+    console.log(location)
+    
+// {
+//     pathname: "/services", 
+//     search: "", 
+//     hash: "", 
+//     state: null, 
+//     key: "qyfp8w"
+// }
+
+search: "?something=hello&blah=goodbye"
+contine ce se afla dupa ? 
+
+-------------Redirect component in React Router
+
+import {Redirect} from "react-router-dom"
+
+function App() {        
+    return (
+        <div>
+            <Redirect to="/whatever" />
+        </div>
+    )
+}
+
+face redirect la to
+
+// https://reacttraining.com/react-router/web/example/auth-workflow
+
+
+-=-=-=-=
+
+tine minte!!!
+<Context.Provide> <Router> ..... </Router> </Context.Provider>
+
+
+
+
+
+
+
+
+
+
